@@ -35,13 +35,16 @@
 
   <div id="container">
     <div id="main" role="main">
-      <div id="top_display">
+      <div class="top_display">
         <span id="clock">0.0</span>
         <input id="time_offset" value="0.0"></input>
       </div>
+      <div class="top_display left">
+        <span id="music_toggle">Music</span>
+      </div>
     </div>
     <footer>
-
+      <audio id="di_chillout" src="http://u10.di.fm:80/di_chillout"></audio>
     </footer>
   </div> <!--! end of #container -->
 
@@ -55,11 +58,19 @@
 
   <!-- scripts concatenated and minified via ant build script-->
   <script src="js/plugins.js"></script>
+  <script src="js/libs/rgbcolor.js"></script>
+  <script src="js/libs/canvg.js"></script>
+  <script src="js/scene_item.js"></script>
   <script src="js/script.js"></script>
   <script>$( function() {
          $("#time_offset").change( function(){
            window.offsetTime = parseFloat($("#time_offset").attr('value'));
          });
+$("#music_toggle").click(function() {     
+  var audio = $("#di_chillout").get(0);
+  if (audio.paused) { audio.play(); } 
+  else { audio.pause(); }     
+});
          landscape();
          }) </script>
   <!-- end scripts-->

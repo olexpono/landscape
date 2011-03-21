@@ -1,9 +1,14 @@
 /* Author: 
-
+  Olex Ponomarenko // tholex.com
 */
 (function(window, document, undefined){
+  //Globally-accessible dynamics
+  window.offsetTime = 0.0;
+  window.observerSpeed = 10.0;
+  window.currentSceneItems = new Array();
 
-  var container, canvas, 
+  //Local Constants & dynamics
+  var container, canvas, savecanvas, 
   SCREEN_WIDTH = window.innerWidth,
   SCREEN_HEIGHT = window.innerHeight,
   X_AXIS = 0,
@@ -12,7 +17,6 @@
   horizonY = window.innerHeight * (.7),
   context,
   memoTime = 0.0;
-  window.offsetTime = 0.0;
   var COLOR_FOR_HOUR = [ [120, 28, 58],
                          [69,21,61],
                          [37,0,70],
@@ -76,9 +80,25 @@ window.drawLandscape = function() {
   clearCanvas();
   drawSky();
   drawGround();
-  /* drawClock(); */
-  /* aiming for 30 FPS */
-  window.drawTimer = setTimeout(drawLandscape, 50);
+  drawSceneItems();
+  // draw again after 35ms (no guaranteed FPS, 28 = max);
+  window.drawTimer = setTimeout(drawLandscape, 35);
+}
+
+function drawSceneItems(){
+  // Does a sort by distance (furthest first (hopefully))
+  sortSceneItems();
+  for(var i; i < window.currentSceneItems.length; i++){
+    currentSceneItems[i].update(OBSERVER_SPEED);
+    drawSceneItem(currentSceneItems[i]);
+  }
+}
+
+function drawSceneItem( scene_item ){
+  // drawSvg( url, dx, dy, dw, dh );
+  context.drawSvg(scene_item.imageUrl,
+                  scene_item.xpos, 
+                  scene_item.parallaxY);
 }
 
 function clearCanvas(){
@@ -113,7 +133,7 @@ function skyColorFromTime(tod) {
 }
 
 function drawSunGlow(){
-  var sunGlowGradient = context.createRadialGradient(sunX(), sunY(), 0, sunX()+Math.random()*2, sunY()+Math.random()*2, sunGlowRadius());
+  var sunGlowGradient = context.createRadialGradient(sunX(), sunY(), 0, sunX()+Math.random()*2-1, sunY()+Math.random(), sunGlowRadius());
   sunGlowGradient.addColorStop(0, "rgba(255,40,0,1)");
   sunGlowGradient.addColorStop(.4, "rgba(255, 32, 0, .8)");
   sunGlowGradient.addColorStop(1, "rgba(255,40,0,0)");
@@ -137,7 +157,12 @@ function drawSun(){
 }
 
 function drawMoonGlow(){
-
+  var moonGlowGradient = context.createRadialGradient(moonX(), moonY(), 0, moonX()+Math.random()*2-1, moonY(), 100);
+  moonGlowGradient.addColorStop(0, "rgba(0,0,0,.4)");
+  moonGlowGradient.addColorStop(.5, "rgba(0,0,0,.2)");
+  moonGlowGradient.addColorStop(1, "rgba(0,0,0,0)");
+  context.fillStyle = moonGlowGradient;
+  context.fillRect(0, 0, SCREEN_WIDTH, horizonY);
 }
 
 function drawMoon(){
@@ -168,7 +193,7 @@ function moonY(){
 function moonX(){
   return SCREEN_WIDTH*.5 + Math.sin(timeOfDay()*Math.PI*2)*SCREEN_WIDTH*0.3;
 }
-
+// UTILITIES & SELF EXPLANATORY
 window.lerpColor = function(rgb1, rgb2, proportion){
   // Linear Interpolation between two rgb colors,
   // args: [#,#,#], [#,#,#], 0-1.0 float
@@ -178,6 +203,17 @@ window.lerpColor = function(rgb1, rgb2, proportion){
     newRGB[i] = parseInt(rgb1[i]*(1.0-proportion) + rgb2[i]*proportion);
   }
   return "rgb(".concat(newRGB.join(",") , ")");
+}
+
+function sortSceneItems(){
+  Array.prototype.sort.call(window.currentThemeItems, function(a,b){
+    if (a.distance > b.distance)
+      return -1;
+    else if (b.distance > a.distance)
+      return 1;
+    else
+      return 0;
+  });
 }
 
 function onWindowResize(){
@@ -199,6 +235,7 @@ function onWindowResize(){
   context.drawImage(savecanvas, 0, 0);
 }
 
+// 0..1 of the day. i.e. at 6AM it returns 0.25 + global offsetTime % 1
 function timeOfDay(){
   var d_now = new Date();
   var seconds_past = d_now.getHours()*3600.0 +
