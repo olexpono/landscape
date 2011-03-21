@@ -4,7 +4,7 @@
 (function(window, document, undefined){
   //Globally-accessible dynamics
   window.offsetTime = 0.0;
-  window.observerSpeed = 10.0;
+  window.observerSpeed = -10.0;
   window.currentSceneItems = new Array();
 
   //Local Constants & dynamics
@@ -82,23 +82,21 @@ window.drawLandscape = function() {
   drawGround();
   drawSceneItems();
   // draw again after 35ms (no guaranteed FPS, 28 = max);
-  window.drawTimer = setTimeout(drawLandscape, 35);
+  window.drawTimer = setTimeout(drawLandscape, 20);
 }
 
 function drawSceneItems(){
   // Does a sort by distance (furthest first (hopefully))
   sortSceneItems();
-  for(var i; i < window.currentSceneItems.length; i++){
-    currentSceneItems[i].update(OBSERVER_SPEED);
+  for(var i = 0; i < window.currentSceneItems.length; i++){
+    currentSceneItems[i].update(window.observerSpeed);
     drawSceneItem(currentSceneItems[i]);
   }
 }
 
 function drawSceneItem( scene_item ){
   // drawSvg( url, dx, dy, dw, dh );
-  context.drawSvg(scene_item.imageUrl,
-                  scene_item.xpos, 
-                  scene_item.parallaxY);
+  scene_item.draw(context);
 }
 
 function clearCanvas(){
@@ -143,9 +141,6 @@ function drawSunGlow(){
 
 function sunGlowRadius(){
   var tod = timeOfDay();
-  if( (tod < .20) || (tod > .8)){
-    return 50;
-  }
   return Math.abs(Math.sin(tod*Math.PI*2))*220;
 }
 
