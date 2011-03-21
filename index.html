@@ -35,7 +35,10 @@
 
   <div id="container">
     <div id="main" role="main">
-      <span id="clock">0.0</span>
+      <div id="top_display">
+        <span id="clock">0.0</span>
+        <input id="time_offset" value="0.0"></input>
+      </div>
     </div>
     <footer>
 
@@ -53,7 +56,12 @@
   <!-- scripts concatenated and minified via ant build script-->
   <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
-  <script>$( landscape() )</script>
+  <script>$( function() {
+         $("#time_offset").change( function(){
+           window.offsetTime = parseFloat($("#time_offset").attr('value'));
+         });
+         landscape();
+         }) </script>
   <!-- end scripts-->
 
 

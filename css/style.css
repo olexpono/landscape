@@ -171,10 +171,9 @@ a:hover { color: #036; }
 * { color: #555; font-family:Monospace; font-size:12px; }
 body { margin: 0px; overflow: hidden; }
 canvas { opacity: 1.0; position:absolute; z-index: -1; left: 0px;}
-
-span#clock {
+div#top_display {
   float: left;
-  width: 200px;
+  width: 350px;
   font-size: 18px;
   font-family: "Century Gothic", Century, DIN, Helvetica;
   z-index: 5;
@@ -184,16 +183,10 @@ span#clock {
   color: #C4A040;
   background: #000;
 }
-
-
-
-
-
-
-
-
-
-
+div#top_display input, div#top_display span {
+  margin: 0px 10px;
+  display:inline-block;
+}
 
 
 
