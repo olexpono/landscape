@@ -4,7 +4,7 @@
 (function(window, document, undefined){
   //Globally-accessible dynamics
   window.offsetTime = 0.0;
-  window.observerSpeed = -10.0;
+  window.observerSpeed = -45.0;
   window.currentSceneItems = new Array();
   window.currentAirItems = new Array();
 
@@ -88,10 +88,16 @@ window.drawLandscape = function() {
 }
 
 function drawSceneItems(){
+  airItemsColor = skyColorFromTimeWithAlpha(timeOfDay()+ 0.08, .8);
   sceneItemsColor = skyColorFromTimeWithAlpha(timeOfDay()- 0.08, .8);
-  context.fillStyle = sceneItemsColor;
   // Does a sort by distance (furthest first (hopefully))
   sortSceneItems();
+  context.fillStyle = airItemsColor;
+  for(var i = 0; i < window.currentAirItems.length; i++){
+    currentAirItems[i].update(window.observerSpeed);
+    drawSceneItem(currentAirItems[i]);
+  }
+  context.fillStyle = sceneItemsColor;
   for(var i = 0; i < window.currentSceneItems.length; i++){
     currentSceneItems[i].update(window.observerSpeed);
     drawSceneItem(currentSceneItems[i]);
