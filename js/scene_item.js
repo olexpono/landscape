@@ -47,7 +47,7 @@ SceneItem.prototype.baseHeight = function() {
 SceneItem.prototype.parallaxY = function() {
   // returns top corner of where this object should be rendered
   // assuming height is set
-  return this.baseHeight() - this.height;
+  return this.baseHeight() - this.height * this.parallaxRatio();
 };
 
 SceneItem.prototype.draw = function (context) {
