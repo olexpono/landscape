@@ -1,14 +1,27 @@
-window.spawnSceneItems = function() {
-  // make a random scene item (wohoo!)
-  var rDistSqrt = 2+Math.random()*18;
-  var randomSceneItem = new SceneItem(window.innerWidth, Math.pow(rDistSqrt, rDistSqrt), (100+100*Math.random()));
-  window.currentSceneItems = currentSceneItems.filter( function(cur_item) {
-    if(cur_item.xpos < -100){ // remove items that are going off the left side
+window.itemFilterFunction = function(cur_item) {
+    if(cur_item.xpos < -200){ // remove items that are going off the left side
       return false;
     } else { return true; }
-  });
-  window.currentSceneItems.push(randomSceneItem);
-  window.spawnTimer = setTimeout(spawnSceneItems, 200+Math.random()*200);
+  }
+
+window.spawnSceneItems = function() {
+  // make a random scene item (wohoo!)
+  if (window.currentSceneItems.length < 420) {
+    var rDistSqrt = 2+Math.random()*18;
+    var sceneItemHeight = Math.random() > 0.9 ? (400 + Math.random()*100) : 200;
+    var randomSceneItem = new SceneItem(window.innerWidth, Math.pow(rDistSqrt, 4), (sceneItemHeight));
+    window.currentSceneItems.push(randomSceneItem);
+  }
+  if (window.currentAirItems.length < 420) {
+    var rDistSqrt = 2+Math.random()*18;
+    var randomAirItem = new SceneItem(window.innerWidth, Math.pow(rDistSqrt, 4),
+ 100);
+    randomAirItem.airItem = true;
+    window.currentAirItems.push(randomAirItem);
+  }
+  window.currentSceneItems = currentSceneItems.filter(itemFilterFunction);
+  window.currentAirItems = currentAirItems.filter(itemFilterFunction);
+  window.spawnTimer = setTimeout(spawnSceneItems, 250+Math.random()*200);
 }
 
 /* SceneItem Class
@@ -23,6 +36,7 @@ function SceneItem(xpos, distance, height, imageUrl, speed) {
   this.height = height;
   this.speed = speed;
   this.imageUrl = imageUrl;
+  this.airItem = false;
 }
 
 SceneItem.prototype.DISTANCE_SCALE = 50;
@@ -56,12 +70,13 @@ SceneItem.prototype.draw = function (context) {
   else if( this.customDraw != null )
     this.customDraw(context);
   else { //placeholder box
-    context.fillStyle = "rgba(145,62,62, 0.9)";
-    var parallaxedSide = this.height * this.parallaxRatio();
+    // context.fillStyle = "rgba(145,62,62, 0.9)";
+    var parallaxedHeight = this.height * this.parallaxRatio();
+    var parallaxedWidth = 200 * this.parallaxRatio();
     context.fillRect(this.xpos, 
                      this.parallaxY(),
-                     parallaxedSide,
-                     parallaxedSide);
+                     parallaxedWidth,
+                     parallaxedHeight);
   }
 }
 

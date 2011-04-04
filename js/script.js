@@ -6,6 +6,7 @@
   window.offsetTime = 0.0;
   window.observerSpeed = -10.0;
   window.currentSceneItems = new Array();
+  window.currentAirItems = new Array();
 
   //Local Constants & dynamics
   var container, canvas, savecanvas, 
@@ -16,6 +17,7 @@
   TARGET_FPS = 30,
   horizonY = window.innerHeight * (.7),
   context,
+  sceneItemsColor,
   memoTime = 0.0;
   var COLOR_FOR_HOUR = [ [120, 28, 58],
                          [69,21,61],
@@ -86,6 +88,8 @@ window.drawLandscape = function() {
 }
 
 function drawSceneItems(){
+  sceneItemsColor = skyColorFromTimeWithAlpha(timeOfDay()- 0.08, .8);
+  context.fillStyle = sceneItemsColor;
   // Does a sort by distance (furthest first (hopefully))
   sortSceneItems();
   for(var i = 0; i < window.currentSceneItems.length; i++){
@@ -95,7 +99,6 @@ function drawSceneItems(){
 }
 
 function drawSceneItem( scene_item ){
-  // drawSvg( url, dx, dy, dw, dh );
   scene_item.draw(context);
 }
 
@@ -116,7 +119,7 @@ function drawSkyGradient(){
   // top of the sky = sky color at the moment
   backgroundGradient.addColorStop(0, skyColorFromTime(timeOfDay()));
   // bottom of the sky = sky color ~20+ mins from now
-  backgroundGradient.addColorStop(1, skyColorFromTime(timeOfDay()+ .02)); 
+  backgroundGradient.addColorStop(1, skyColorFromTime(timeOfDay()+ .025)); 
   context.fillStyle = backgroundGradient;
   context.fillRect(0, 0, SCREEN_WIDTH, horizonY);
 }
@@ -124,16 +127,28 @@ function drawSkyGradient(){
 function skyColorFromTime(tod) {
   //tod is 0-1 for 24 hours
   var proportionOfHour = tod * 24 % 1;
-  var previousHourColor = COLOR_FOR_HOUR[parseInt(tod*24)];
+  var previousHourColor = COLOR_FOR_HOUR[parseInt(tod*24) % 24];
   // parse current hour, add one, with 0-23 wraparound
-  var nextHourColor = COLOR_FOR_HOUR[ (parseInt(tod*24)+1)%24 ];
+  var nextHourColor = COLOR_FOR_HOUR[ (parseInt(tod*24)+1) % 24 ];
+  return lerpColor(previousHourColor, nextHourColor, proportionOfHour);
+}
+
+function skyColorFromTimeWithAlpha(tod, alpha) {
+  // relatively expensive method
+  //tod is 0-1 for 24 hours
+  var proportionOfHour = tod * 24 % 1;
+  var previousHourColor = COLOR_FOR_HOUR[parseInt(tod*24) % 24].slice(0);
+  // parse current hour, add one, with 0-23 wraparound
+  var nextHourColor = COLOR_FOR_HOUR[(parseInt(tod*24)+1) % 24].slice(0);
+  previousHourColor.push(alpha);
+  nextHourColor.push(alpha);
   return lerpColor(previousHourColor, nextHourColor, proportionOfHour);
 }
 
 function drawSunGlow(){
   var sunGlowGradient = context.createRadialGradient(sunX(), sunY(), 0, sunX()+Math.random()*2-1, sunY()+Math.random(), sunGlowRadius());
-  sunGlowGradient.addColorStop(0, "rgba(255,40,0,1)");
-  sunGlowGradient.addColorStop(.4, "rgba(255, 32, 0, .8)");
+  sunGlowGradient.addColorStop(0, "rgba(255, 0,0,.6)");
+  sunGlowGradient.addColorStop(.4, "rgba(255, 0, 0, .5)");
   sunGlowGradient.addColorStop(1, "rgba(255,40,0,0)");
   context.fillStyle = sunGlowGradient;
   context.fillRect(0, 0, SCREEN_WIDTH, horizonY);
@@ -141,11 +156,11 @@ function drawSunGlow(){
 
 function sunGlowRadius(){
   var tod = timeOfDay();
-  return Math.abs(Math.sin(tod*Math.PI*2))*220;
+  return Math.max(0, Math.abs(Math.sin(tod*Math.PI*2))-0.125)*160;
 }
 
 function drawSun(){
-  context.fillStyle = "rgba(255,255,175, 0.95)";
+  context.fillStyle = "rgba(255,255,255, 1)";
   context.beginPath();
   context.arc(sunX(), sunY(), 30, 0, Math.PI*2, 1);
   context.fill();
@@ -161,7 +176,7 @@ function drawMoonGlow(){
 }
 
 function drawMoon(){
-  context.fillStyle = "rgba(202,202,202, 0.95)";
+  context.fillStyle = "rgba(190,190,225, 0.95)";
   context.beginPath();
   context.arc(moonX(), moonY(), 30, 0, Math.PI*2, 1);
   context.fill();
@@ -193,11 +208,17 @@ window.lerpColor = function(rgb1, rgb2, proportion){
   // Linear Interpolation between two rgb colors,
   // args: [#,#,#], [#,#,#], 0-1.0 float
   // returns CSS-parseable string like "rgb(24, 56, 220)"
-  var newRGB = [0, 0, 0];
+  var newRGB = new Array(rgb1.length);
   for(var i = 0; i< newRGB.length; i++){
-    newRGB[i] = parseInt(rgb1[i]*(1.0-proportion) + rgb2[i]*proportion);
+    if(i != 3) { // Normal colors (must be int)
+      newRGB[i] = parseInt(rgb1[i]*(1.0-proportion) + rgb2[i]*proportion);
+    }
+    else {       // Alpha must be left as float
+      newRGB[i] = rgb1[i]*(1.0-proportion) + rgb2[i]*proportion;
+    }
   }
-  return "rgb(".concat(newRGB.join(",") , ")");
+  var colorcode = newRGB.length == 3 ? "rgb" : "rgba";
+  return colorcode.concat("(", newRGB.join(",") , ")");
 }
 
 function sortSceneItems(){
@@ -237,7 +258,7 @@ function timeOfDay(){
                      d_now.getMinutes()*60.0 +
                      d_now.getSeconds() +
                      d_now.getMilliseconds()/1000.0;
-  return ((seconds_past)/(24*3600.0)+ window.offsetTime)%1;
+  return ((seconds_past)/(24*3600.0)+ (((window.offsetTime % 1)+1)%1))%1;
 }
 
 

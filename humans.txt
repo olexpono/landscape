@@ -3,10 +3,10 @@
 
 
 /* TEAM */
-  <your title>: <your name>
-  Site: 
-  Twitter: 
-  Location: 
+  Developer: Olex
+  Site: tholex.com
+  Twitter: tholex
+  Location: NYC, USA
 
 /* THANKS */
   Names (& URL): 
