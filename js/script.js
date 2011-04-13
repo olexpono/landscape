@@ -4,7 +4,7 @@
 (function(window, document, undefined){
   //Globally-accessible dynamics
   window.offsetTime = 0.0;
-  window.observerSpeed = -45.0;
+  window.observerSpeed = -15.0;
   window.currentSceneItems = new Array();
   window.currentAirItems = new Array();
 
@@ -18,6 +18,7 @@
   horizonY = window.innerHeight * (.7),
   context,
   sceneItemsColor,
+  sunRotation = 0.0;
   memoTime = 0.0;
   var COLOR_FOR_HOUR = [ [120, 28, 58],
                          [69,21,61],
@@ -28,8 +29,8 @@
                          [25,229,169],
                          [149,209,44],
                          [48,209,23],
-                         [0,255,0],
-                         [0,255,255],
+                         [0,235,0],
+                         [0,215,255],
                          [0,182,255],
                          [0,129,255],
                          [75,81,242],
@@ -166,6 +167,7 @@ function sunGlowRadius(){
 }
 
 function drawSun(){
+  sunRotation += 0.081;
   context.fillStyle = "rgba(255,255,255, 1)";
   context.beginPath();
   context.arc(sunX(), sunY(), 30, 0, Math.PI*2, 1);

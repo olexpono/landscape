@@ -1,5 +1,5 @@
 window.itemFilterFunction = function(cur_item) {
-    if(cur_item.xpos < -1*(cur_item.width * cur_item.parallaxRatio())){ // remove items that are going off the left side
+    if(cur_item.xpos < -1*(cur_item.width * 2 * cur_item.parallaxRatio())){ // remove items that are going off the left side
       return false;
     } else { return true; }
   }
@@ -14,7 +14,7 @@ window.spawnSceneItems = function() {
   }
   if (window.currentAirItems.length < 420) {
     var rDistSqrt = 2+Math.random()*18;
-    var randomAirItem = new SceneItem(window.innerWidth, Math.pow(rDistSqrt, 4),
+    var randomAirItem = new SceneItem(window.innerWidth + 90, Math.pow(rDistSqrt, 4),
  Math.random()*(200)+50);
     randomAirItem.airItem = true;
     window.currentAirItems.push(randomAirItem);

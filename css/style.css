@@ -173,7 +173,7 @@ body { margin: 0px; overflow: hidden; }
 canvas { opacity: 1.0; position:absolute; z-index: -1; left: 0px;}
 div.top_display {
   float: left;
-  width: 350px;
+  width: 48px;
   font-size: 18px;
   font-family: "Century Gothic", Century, DIN, Helvetica;
   z-index: 5;
