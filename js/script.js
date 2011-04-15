@@ -167,11 +167,24 @@ function sunGlowRadius(){
 }
 
 function drawSun(){
-  sunRotation += 0.081;
+  sunRotation = (sunRotation + 0.0061) % 1;
   context.fillStyle = "rgba(255,255,255, 1)";
   context.beginPath();
   context.arc(sunX(), sunY(), 30, 0, Math.PI*2, 1);
   context.fill();
+  for(var j=0; j < 7; j++){
+    var pointA = SceneItem.getTrianglePt(sunX(), sunY(), 37+Math.random()*4, sunRotation, j*0.428);
+    var pointB = SceneItem.getTrianglePt(sunX(), sunY(), 30, sunRotation - 0.04, j*0.428);
+    var pointC = SceneItem.getTrianglePt(sunX(), sunY(), 30, sunRotation + 0.04, j*0.428);
+    context.fillStyle = "rgba(255,255,255, 0.85)";
+    context.beginPath();
+    context.moveTo( pointA[0], pointA[1] );
+    context.lineTo( pointB[0], pointB[1] );
+    context.lineTo( pointC[0], pointC[1] );
+    context.lineTo( pointA[0], pointA[1] );
+    context.closePath();
+    context.fill();
+  }
 }
 
 function drawMoonGlow(){
