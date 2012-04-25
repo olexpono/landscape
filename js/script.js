@@ -243,7 +243,7 @@ window.lerpColor = function(rgb1, rgb2, proportion){
 }
 
 function sortSceneItems(){
-  Array.prototype.sort.call(window.currentThemeItems, function(a,b){
+  Array.prototype.sort.call(window.currentSceneItems, function(a,b){
     if (a.distance > b.distance)
       return -1;
     else if (b.distance > a.distance)
