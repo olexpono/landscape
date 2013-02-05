@@ -1,7 +1,6 @@
-(work-in-progress)
+24-hour web animation using HTML5 Canvas and some bits of JQuery.
 
-Art Project to simulate travel & landscapes in "real-time"
+This is up and running on codepen: http://codepen.io/tholex/full/mJldr
 
-Alternatively, it's a 24-hour web animation using HTML5 Canvas and some bits of JQuery.
-
-Most of the files are untouched from an HTML5/CSS3 Boilerplate dir
+This was a project I built in early 2011. 
+Most of the files are untouched from an HTML5/CSS3 Boilerplate dir.
